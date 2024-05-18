@@ -1,0 +1,111 @@
+on rightclick with lime dye:
+  if name of tool of player is "&a&lカエルの足":
+    cancel event
+    if {%player's uuid%.doublejump.count} is not set:
+      set {%player's uuid%.doublejump.count} to 0
+    if {%player's uuid%.doublejump.count} is 0:
+      player's gliding is false
+      add 1 to {%player's uuid%.doublejump.count}
+      push the player forwards at force 1
+      send action bar "&c&l|||" to player
+      wait 8 ticks
+      send action bar "&c&l||&a&l|" to player
+      wait 8 ticks
+      send action bar "&c&l|&a&l||" to player
+      wait 8 ticks
+      send action bar "&a&l|||" to player
+      set {%player's uuid%.doublejump.count} to 0
+
+on rightclick with lime dye:
+  if name of tool of player is "&a&lカエルの足&9&l<<&b&l改&9&l>>":
+    if {%player's uuid%.doublejump.count} is not set:
+      set {%player's uuid%.doublejump.count} to 0
+    if {%player's uuid%.doublejump.count} is 0:
+      player's gliding is false
+      add 1 to {%player's uuid%.doublejump.count}
+      push the player forwards at force 3
+      send action bar "&c&l|||" to player
+      wait 8 ticks
+      send action bar "&c&l||&a&l|" to player
+      wait 8 ticks
+      send action bar "&c&l|&a&l||" to player
+      wait 8 ticks
+      send action bar "&a&l|||" to player
+      set {%player's uuid%.doublejump.count} to 0
+
+on rightclick with light blue dye:
+  if name of tool of player is "&bお魚パワー":
+    cancel event
+    if tool of player is enchanted with mending 1:
+      if player is swimming:
+        if {%player's uuid%.doublejump.count} is not 1:
+          add 1 to {%player's uuid%.doublejump.count}
+          push the player forwards at force 2.5
+          send action bar "&c&l|||||" to player
+          wait 9 ticks
+          send action bar "&c&l||||&a&l|" to player
+          wait 9 ticks
+          send action bar "&c&l|||&a&l||" to player
+          wait 9 ticks
+          send action bar "&c&l||&a&l|||" to player
+          wait 9 ticks
+          send action bar "&c&l|&a&l||||" to player
+          wait 9 ticks
+          send action bar "&a&l|||||" to player
+          set {%player's uuid%.doublejump.count} to 0
+
+on load:
+  set {trampoline.boots} to golden boots named "&a&lトランポリンブーツ"
+
+#トランポリン-----
+
+on walking on slime block:
+  if player's boots is {trampoline.boots}:
+    push the player upwards at force 1
+
+on damage:
+  damage was caused by fall
+  if victim's boots is {trampoline.boots}:
+    cancel event
+
+
+#------
+
+
+on rightclick with blaze rod:
+  if name of tool of player is "&6&lドーピングスティック":
+
+
+on rightclick with gunpowder:
+  if name of tool of player is "&bどこでもエリトラ発射装置":
+    loop 5 times:
+      push the player upwards at force 3
+      wait 8 ticks
+    remove 1 of gunpowder named "&bどこでもエリトラ発射装置" from player's inventory
+
+command /specialgive [<text>]:
+  permission:op
+  trigger:
+    if arg-1 is "frogleg":
+      give player lime dye named "&a&lカエルの足"
+    else if arg-1 is "reset":
+      set {%player's uuid%.doublejump.count} to 0
+    else if arg-1 is "homeup":
+      give player paper named "&aホーム追加券"
+    else if arg-1 is "homes":
+      give player book named "&6Homes"
+    else if arg-1 is "test":
+      give player lime dye named "&a&lカエルの足&9&l<<&b&l改&9&l>>"
+    else if arg-1 is "elytra":
+      give player gunpowder named "&bどこでもエリトラ発射装置"
+    else if arg-1 is "fish":
+      give player light blue dye of mending 1 named "&bお魚パワー" with lore "泳いでいるときのみダッシュできる"
+    else if arg-1 is "powerrod":
+      give player blaze rod named "&6&lドーピングスティック"
+    else if arg-1 is "trampoline":
+      give player {trampoline.boots}
+
+#on damage:
+#  damage cause is fall
+#  victim is holding lime dye named "&a&lカエルの足"
+#  cancel event

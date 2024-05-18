@@ -1,0 +1,10 @@
+on join:
+  set {_now.%player's uuid%} to now
+  set {%player's uuid%.today.date} to "%{_now.%player's uuid%}%"
+
+  if {%player's uuid%.yesterday.date} is {%player's uuid%.today.date}:
+    send "%player% Already received" to console
+  else:
+    send "&6&lログインボーナス！"
+    give player 2 diamond
+    set {%player's uuid%.yesterday.date} to "%{_now.%player's uuid%}%"

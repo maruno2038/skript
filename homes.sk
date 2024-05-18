@@ -1,0 +1,215 @@
+on join:
+  if {%player's uuid%.homecount} is not set:
+    set {%player's uuid%.homecount} to 0
+  if {%player's uuid%.maxhomecount} is not set:
+    set {%player's uuid%.maxhomecount} to 1
+  if {%player's uuid%.maxhomecount} is 0:
+    set {%player's uuid%.maxhomecount} to 1
+
+#command /homegive:
+#  permission:op
+#  trigger:
+#    give player paper named "&aホーム追加券"
+#    give player book named "&6Homes"
+
+on rightclick with paper:
+  if name of tool of player is "&aホーム追加券":
+    if {%player's uuid%.maxhomecount} is 36:
+      send "&cホームはもう増やせません(現在36個)" to player
+    else:
+      add 1 to {%player's uuid%.maxhomecount}
+      send "&6ホームの最大数を増やしました" to player
+      remove 1 of paper named "&aホーム追加券" from player's inventory
+  else:
+    stop
+
+on rightclick with book:
+  if name of tool of player is "&6Homes":
+    open chest inventory with 6 rows named "&6&lHome Menu" to player
+    set {_i} to 0
+    loop 36 times:
+      set slot {_i} of player's current inventory to red wool named "&c未開放"
+      add 1 to {_i}
+    set {_i} to 0
+    loop {%player's uuid%.maxhomecount} times:
+      set slot {_i} of player's current inventory to lime wool named "&a未設定"
+      add 1 to {_i}
+    set {_i} to 0
+    loop {%player's uuid%.homeList::*}:
+      set slot {_i} of player's current inventory to light blue wool named "%loop-value%"
+      add 1 to {_i}
+    set slot 53 of player's current inventory to barrier named "&e閉じる"
+    set slot 47 of player's current inventory to beacon named "&b現在の位置にホームを設置"
+
+command /homes [<text>]:
+  aliases: /home
+  trigger:
+    if arg-1 is not set:
+      #send "&aホームリスト &b%{%player's uuid%.homecount}% &b/ &b%{%player's uuid%.maxhomecount}%" to player
+      #send {%player's uuid%.homeList::*} to player
+      open chest inventory with 6 rows named "&6&lHome Menu" to player
+      set {_i} to 0
+      loop 36 times:
+        set slot {_i} of player's current inventory to red wool named "&c未開放"
+        add 1 to {_i}
+      set {_i} to 0
+      loop {%player's uuid%.maxhomecount} times:
+        set slot {_i} of player's current inventory to lime wool named "&a未設定"
+        add 1 to {_i}
+      set {_i} to 0
+      loop {%player's uuid%.homeList::*}:
+        set slot {_i} of player's current inventory to light blue wool named "%loop-value%" with lore "&9%{%player's uuid%.home.%loop-value%}%"
+        add 1 to {_i}
+      set slot 53 of player's current inventory to barrier named "&e閉じる"
+      set slot 47 of player's current inventory to beacon named "&b現在の位置にホームを設置"
+    else if arg-1 is set:
+      if {%player's uuid%.home.%arg-1%} is set:
+        teleport player to {%player's uuid%.home.%arg-1%}
+        send "&6テレポートします" to player
+      else:
+        send "&6その名前のホームは見つかりませんでした" to player
+
+on inventory click:
+  name of clicked inventory is "&6&lHome Menu"
+  cancel event
+  if event-item is barrier named "&e閉じる":
+    close player's inventory
+    stop
+  if event-item is light blue wool:
+    set {%player%.home.itemName} to "%the name of event-item%"
+    #send "%{%player%.home.itemName}%" to player
+    open chest inventory with 3 rows named "&6&lHome Menu" to player
+    set slot 26 of player's current inventory to barrier named "&e閉じる"
+    set slot 11 of player's current inventory to ender pearl named "&aテレポート"
+    set slot 15 of player's current inventory to damaged anvil named "&cこのホームを削除"
+  else if event-item is ender pearl named "&aテレポート":
+    teleport player to {%player's uuid%.home.%{%player%.home.itemName}%}
+    send "&6テレポートします" to player
+    close player's inventory
+  else if event-item is damaged anvil named "&cこのホームを削除":
+    clear {%player's uuid%.home.%{%player%.home.itemName}%}
+    remove 1 from {%player's uuid%.homecount}
+    remove {%player%.home.itemName} from {%player's uuid%.homeList::*}
+    send "&6ホームを削除しました" to player
+    close player's inventory
+  else if event-item is beacon named "&b現在の位置にホームを設置":
+    if player's world is "sigen":
+      send "&c資源ワールドでホームは設定できません" to player
+      close player's inventory
+      stop
+    if {%player's uuid%.homecount} < {%player's uuid%.maxhomecount}:
+      set {%player's uuid%.sethome.mode} to true
+      send "&6チャット欄にホームの名前を入力してください" to player
+      close player's inventory
+    else:
+      send "&cホームの数が%{%player's uuid%.maxhomecount}%に達しています" to player
+      close player's inventory
+
+on chat:
+  if {%player's uuid%.sethome.mode} is true:
+    cancel event
+    if player's world is "sigen":
+      send "&c資源ワールドでホームは設定できません" to player
+      set {%player's uuid%.sethome.mode} to false
+      stop
+    if {%player's uuid%.home.%message%} is not set:
+      set {%player's uuid%.home.%message%} to location of player
+      add 1 to {%player's uuid%.homecount}
+      send "&6ホームをセットしました" to player
+      add message to {%player's uuid%.homeList::*}
+    else:
+      set {%player's uuid%.home.%message%} to location of player
+      send "&6ホームを上書きしました" to player
+    set {%player's uuid%.sethome.mode} to false
+
+command /sethome <text>:
+  trigger:
+    if player's world is "sigen":
+      send "&c資源ワールドでホームは設定できません" to player
+      stop
+    else:
+      if arg-1 is not set:
+        send "&cホームの名前を設定してください" to player
+      else if arg-1 is set:
+        if {%player's uuid%.home.%arg-1%} is not set:
+          if {%player's uuid%.homecount} < {%player's uuid%.maxhomecount}:
+            set {%player's uuid%.home.%arg-1%} to location of player
+            add 1 to {%player's uuid%.homecount}
+            send "&6ホームをセットしました" to player
+            add arg-1 to {%player's uuid%.homeList::*}
+          else:
+            send "&cホームの数が%{%player's uuid%.maxhomecount}%に達しています" to player
+        else:
+          set {%player's uuid%.home.%arg-1%} to location of player
+          send "&6ホームを上書きしました" to player
+
+command /deletehome <text>:
+  trigger:
+    if arg-1 is not set:
+      send "&c削除するホームを指定してください" to player
+    else:
+      if {%player's uuid%.home.%arg-1%} is set:
+        clear {%player's uuid%.home.%arg-1%}
+        remove 1 from {%player's uuid%.homecount}
+        remove arg-1 from {%player's uuid%.homeList::*}
+        send "&6ホームを削除しました" to player
+      else:
+        send "&6その名前のホームは見つかりませんでした" to player
+
+command /sethomecount <offline player> <number>:
+  permission:op
+  trigger:
+    if arg-2 is not set:
+      send "&c数値を入力してください" to player
+    else:
+      set {%arg-1's uuid%.maxhomecount} to arg-2
+      send "&6ホームの最大値を&a%arg-2%&6に設定しました" to player
+
+command /homereset <player>:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      send "&cプレイヤーを指定してください" to player
+    else:
+      set {%arg-1's uuid%.homecount} to 0
+      clear {%arg-1's uuid%.homeList::*}
+      clear {%arg-1's uuid%.home.}
+      send "&2%arg-1%さんのホームをリセットしました" to player
+
+command /seehome <offline player>:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      send "&cプレイヤーを指定してください" to player
+    else:
+      set {seehome.playername} to "%arg-1's uuid%"
+      open chest inventory with 6 rows named "&6&lHome Menu See" to player
+      set {_i} to 0
+      loop 36 times:
+        set slot {_i} of player's current inventory to red wool named "&c未開放"
+        add 1 to {_i}
+      set {_i} to 0
+      loop {%arg-1's uuid%.maxhomecount} times:
+        set slot {_i} of player's current inventory to lime wool named "&a未設定"
+        add 1 to {_i}
+      set {_i} to 0
+      loop {%arg-1's uuid%.homeList::*}:
+        set slot {_i} of player's current inventory to blue wool named "%loop-value%" with lore "&9%{%arg-1's uuid%.home.%loop-value%}%"
+        add 1 to {_i}
+      set slot 53 of player's current inventory to barrier named "&e閉じる"
+      set slot 49 of player's current inventory to paper named "&a%arg-1%"
+
+on inventory click:
+  name of clicked inventory is "&6&lHome Menu See"
+  cancel event
+  if event-item is barrier named "&e閉じる":
+    close player's inventory
+    stop
+  if event-item is blue wool:
+    set {%player%.home.itemName} to "%the name of event-item%"
+    teleport player to {%{seehome.playername}%.home.%{%player%.home.itemName}%}
+    send "&6テレポートします" to player
+    close player's inventory
+
+on tab complete of "/home" or "/homes":
+  set tab completions for position 1 to {%player's uuid%.homeList::*}

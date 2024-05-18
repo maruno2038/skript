@@ -1,0 +1,58 @@
+on damage:
+  if attacker is player:
+    if attacker's world is "world":
+      if {killmode.%victim%} is false:
+        attacker is not victim
+        cancel event
+        send "&e相手はpvpオフになっています" to attacker
+      else:
+        stop
+    else:
+      stop
+  else:
+    stop
+
+on join:
+  if {killmode.%player%} is not set:
+    set {killmode.%player%} to false
+
+command /killmode [<string>] [<player>] [<string>]:
+  trigger:
+    if arg-1 is set:
+      if arg-1 is "ON":
+        set {killmode.%player%} to true
+        send "&eオンにしました" to player
+      else if arg-1 is "OFF":
+        set {killmode.%player%} to false
+        send "&eオフにしました" to player
+      else if arg-1 is "allof":
+        if player is op:
+          loop all players:
+            set {killmode.%loop-player%} to false
+          send "&b全員をオフにしました" to player
+        else:
+          send "&4それはできないなぁ.." to player
+      else if arg-1 is "set":
+        if player is op:
+          if arg-2 is set:
+            if arg-3 is "ON":
+              set {killmode.%arg-2%} to true
+              send "&b%arg-2%のpvpモードをオンにしました" to player
+            else if arg-3 is "OFF":
+              set {killmode.%arg-2%} to false
+              send "&b%arg-2%のpvpモードをオフにしました" to player
+            else:
+              send "使い方が違うよ" to player
+        else:
+          send "&4そんなことすんなよぉ" to player
+    else:
+      if {killmode.%player%} is not set:
+        set {killmode.%player%} to false
+      if {killmode.%player%} is true:
+        send "&6現在、オンです" to player
+      else if {killmode.%player%} is false:
+        send "&6現在、オフです" to player
+
+on tab complete of "/killmode":
+  set tab completions for position 1 to "ON" ,"allof" and "OFF"
+  set tab completions for position 3 to "ON" and "OFF"

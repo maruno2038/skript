@@ -1,0 +1,5 @@
+command /getplayeruuid <offline player>:
+  permission:op
+  trigger:
+    if arg-1 is set:
+      send " %arg-1% : %arg-1's uuid% "

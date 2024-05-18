@@ -1,0 +1,34 @@
+#看板設置用
+on rightclick on sign:
+  player is op
+  if line 1 of the clicked block is "easyteleport":
+    set line 1 to "&9&l[テレポート]"
+    set line 2 to "&bshow GUI"
+    set line 4 to "&b右クリックでGUI表示"
+
+#show GUI
+on rightclick on sign:
+  line 1 of the clicked block is "&9&l[テレポート]"
+  line 2 of the clicked block is "&bshow GUI"
+  line 4 of the clicked block is "&b右クリックでGUI表示"
+  open chest inventory with 6 rows named "&9テレポート" to player
+  set slot 53 of player's current inventory to barrier named "&e閉じる"
+  set slot 10 of player's current inventory to stone named "&9スーパー"
+  set slot 12 of player's current inventory to packed ice named "&9ボートレース場"
+
+#inventory click
+on inventory click:
+  name of clicked inventory is "&9テレポート"
+  cancel event
+  if event-item is barrier named "&e閉じる":
+    close player's inventory
+    stop
+  else if event-item is stone named "&9スーパー":
+    wait 3 ticks
+    teleport player to location(-292,67,29, world "world")
+    send "&6スーパーにテレポートします" to player
+  else if event-item is packed ice named "&9ボートレース場":
+    wait 3 ticks
+    teleport player to location(-601,63,859, world "world")
+    send "&6ボートレース場にテレポートします" to player
+  close player's inventory

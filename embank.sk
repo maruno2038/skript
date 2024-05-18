@@ -1,0 +1,154 @@
+command /embank:
+	trigger:
+		open chest inventory with 4 row named "&aemerald bank" to player
+		set {_i} to 0
+		set {_glass} to white glass pane named " "
+		loop 36 times:
+			set slot {_i} of player's current inventory to {_glass}
+			add 1 to {_i}
+		set slot 11 of player's current inventory to chest named "&a&l預け入れ"
+		if {embank.%player%} is not set:
+			set slot 15 of player's current inventory to dropper named "&a&l引き出し" with lore "エメラルドを預けていません"
+		else:
+			set slot 15 of player's current inventory to dropper named "&a&l引き出し" with lore "エメラルドを%{embank.%player%}%個預けています"
+		set slot 35 of player's current inventory to barrier named "&4閉じる"
+		
+on inventory click:
+	name of clicked inventory is "&aemerald bank"
+	cancel event
+	if event-item is item named "&a&l預け入れ":
+		open chest inventory with 4 row named "&a&l預け入れ" to player
+		set {_i} to 0
+		set {_glass} to white glass pane named " "
+		loop 36 times:
+			set slot {_i} of player's current inventory to {_glass}
+			add 1 to {_i}
+		set {_em-%player%} to amount of emerald in the player's inventory
+		if {_em-%player%} is 0:
+			set slot 11 of player's current inventory to emerald block named "&a&l全て預ける" with lore "エメラルドを預けられません"
+		else:	
+			set slot 11 of player's current inventory to emerald block named "&a&l全て預ける" with lore "エメラルドを%{_em-%player%}%個預ける"
+		if {_em-%player%} is 0:
+			set slot 13 of player's current inventory to emerald named "&a&l64個預ける" with lore "エメラルドを預けられません"
+		else:
+			set slot 13 of player's current inventory to emerald named "&a&l64個預ける" with lore "エメラルドを64個預ける"
+		if {_em-%player%} is 0:
+			set slot 15 of player's current inventory to emerald named "&a&l32個預ける" with lore "エメラルドを預けられません"
+		else:
+			set slot 15 of player's current inventory to emerald named "&a&l32個預ける" with lore "エメラルドを32個預ける"
+		set slot 35 of player's current inventory to barrier named "&4閉じる"
+	if event-item is item named "&a&l引き出し":
+		open chest inventory with 4 row named "&a&l引き出し" to player
+		set {_i} to 0
+		set {_glass} to white glass pane named " "
+		loop 36 times:
+			set slot {_i} of player's current inventory to {_glass}
+			add 1 to {_i}
+		if {embank.%player%} is not set:
+			set slot 11 of player's current inventory to emerald block named "&a&l全て引き出す" with lore "エメラルドを引き出せません"
+		else:
+			set slot 11 of player's current inventory to emerald block named "&a&l全て引き出す" with lore "エメラルドを%{embank.%player%}%個引き出す"
+		if {embank.%player%} is not set:
+			set slot 13 of player's current inventory to emerald named "&a&l64個引き出す" with lore "エメラルドを引き出せません"
+		else:
+			set slot 13 of player's current inventory to emerald named "&a&l64個引き出す" with lore "エメラルドを64個引き出す"
+		if {embank.%player%} is not set:
+			set slot 15 of player's current inventory to emerald named "&a&l32個引き出す" with lore "エメラルドを引き出せません"
+		else:
+			set slot 15 of player's current inventory to emerald named "&a&l32個引き出す" with lore "エメラルドを32個引き出す"
+		set slot 35 of player's current inventory to barrier named "&4閉じる"
+	if event-item is item named "&4閉じる":
+		close player's inventory
+		
+on inventory click:
+	name of clicked inventory is "&a&l預け入れ" or "&a&l引き出し"
+	cancel event
+	set {_em-%player%} to amount of emerald in the player's inventory
+	if event-item is item named "&a&l全て預ける":
+		if {_em-%player%} is 0:
+			send "&a&lエメラルドを預けられませんでした"
+			close player's inventory
+		else:
+			send "&a&lエメラルドを%{_em-%player%}%&a&l個預けました" to player
+			add {_em-%player%} to {embank.%player%}
+			remove all emerald from player's inventory
+			close player's inventory
+	if event-item is item named "&a&l64個預ける":
+		if {_em-%player%} is 0:
+			send "&a&lエメラルドを預けられませんでした"
+			close player's inventory
+		else:
+			set {_emcount} to 0
+			loop 64 times:
+				if {_em-%player%} is {_emcount}:
+					send "&a&lエメラルドを預けられませんでした"
+					close player's inventory
+					stop
+				else:
+					add 1 to {_emcount}
+			send "&a&lエメラルドを６４個預けました" to player
+			add 64 to {embank.%player%}
+			remove 64 of emerald from player's inventory
+			close player's inventory
+	if event-item is item named "&a&l32個預ける":
+		if {_em-%player%} is 0:
+			send "&a&lエメラルドを預けられませんでした"
+			close player's inventory
+		else:
+			set {_emcount} to 0
+			loop 32 times:
+				if {_em-%player%} is {_emcount}:
+					send "&a&lエメラルドを預けられませんでした"
+					close player's inventory
+					stop
+				else:
+					add 1 to {_emcount}
+			send "&a&lエメラルドを３２個預けました" to player
+			add 32 to {embank.%player%}
+			remove 32 of emerald from player's inventory
+			close player's inventory
+	if event-item is item named "&a&l全て引き出す":
+		if {embank.%player%} is not set:
+			send "&a&lエメラルドを引き出せませんでした"
+			close player's inventory
+		else:	
+			add {embank.%player%} of emerald to player
+			send "&a&lエメラルドを%{embank.%player%}%&a&l個引き出しました"
+			delete {embank.%player%}
+			close player's inventory
+	if event-item is item named "&a&l64個引き出す":
+		if {embank.%player%} is not set:
+			send "&a&lエメラルドを引き出せませんでした"
+			close player's inventory
+		else:	
+			set {_emcount} to 0
+			loop 64 times:
+				if {embank.%player%} is {_emcount}:
+					send "&a&lエメラルドを引き出せませんでした"
+					close player's inventory
+					stop
+				else:
+					add 1 to {_emcount}
+			add 64 of emerald to player
+			send "&a&lエメラルドを６４個引き出しました"
+			remove 64 from {embank.%player%}
+			close player's inventory
+	if event-item is item named "&a&l32個引き出す":
+		if {embank.%player%} is not set:
+			send "&a&lエメラルドを引き出せませんでした"
+			close player's inventory
+		else:
+			set {_emcount} to 0
+			loop 32 times:
+				if {embank.%player%} is {_emcount}:
+					send "&a&lエメラルドを引き出せませんでした"
+					close player's inventory
+					stop
+				else:
+					add 1 to {_emcount}
+			add 32 of emerald to player
+			send "&a&lエメラルドを３２個引き出しました"
+			remove 32 from {embank.%player%}
+			close player's inventory			
+	if event-item is item named "&4閉じる":
+		close player's inventory

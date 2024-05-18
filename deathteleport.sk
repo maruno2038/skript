@@ -1,0 +1,27 @@
+on death:
+  set {%player's uuid%.lastdeath.location} to location of player
+  if {%player's uuid%.deathnotice} is true:
+    send "%{%player's uuid%.lastdeath.location}%" to player
+
+command /deathnotice <text>:
+  trigger:
+    if arg-1 is "on":
+      set {%player's uuid%.deathnotice} to true
+      send "&a死亡座標を表示します" to player
+    else if arg-1 is "off":
+      set {%player's uuid%.deathnotice} to false
+      send "&a死亡座標を表示しません" to player
+    else if arg-1 is not set:
+      send "&4error : /deathnotice < on | off >"
+
+on teleport:
+  set {%player's uuid%.lastdeath.location} to location of player
+
+command /back:
+  permission:op
+  trigger:
+    teleport player to {%player's uuid%.lastdeath.location}
+    send "&6teleport..." to player
+
+on tab complete of "/deathnotice":
+  set tab completions for position 1 to "on" and "off"

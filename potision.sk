@@ -1,0 +1,18 @@
+command /position [<text>]:
+  trigger:
+    if arg-1 is not set:
+      set {%player's uuid%.position.new} to location of player
+      send "%{%player's uuid%.position.new}%" to player
+    else if arg-1 is "on":
+      loop 180 times:
+        set {%player's uuid%.position.new} to location of player
+        send action bar "%{%player's uuid%.position.new}%" to player
+        wait a second
+    else:
+      send "&a[position]----ヘルプ----" to player
+      send "&a/position : 現在の座標を一回表示" to player
+      send "&a/position on : 座標を3分間表示する(アクションバー)" to player
+      send "&a/position help : ヘルプを表示" to player
+
+on tab complete of "/position":
+  set tab completions for position 1 to "on" and "help"

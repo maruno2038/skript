@@ -1,0 +1,10 @@
+command /setpaintworld:
+  permission:op
+  trigger:
+    set {painting.world.point} to location of player
+    send "&aワープ地点を設置" to player
+
+command /painting:
+  trigger:
+    teleport player to {painting.world.point}
+    send "&9お帰りの際は/spawnで" to player

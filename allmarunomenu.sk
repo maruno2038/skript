@@ -1,0 +1,4 @@
+command /marunoallmenu:
+  trigger:
+    open chest inventory with 6 rows named "&b&lAllMenu" to player
+    set slot 10 of player's current inventory to beacon named "&6スポーン"

@@ -1,0 +1,25 @@
+on death of a ender dragon:
+  set {_name} to damager's uuid
+  if {%{_name}%.killdragon.count} is not set:
+    set {%{_name}%.killdragon.count} to 0
+  add 1 to {%{_name}%.killdragon.count}
+  if {%{_name}%.killdragon.count} is 100:
+    set {%{_name}%.dragonslayer.100} to true
+    send "&9ドラゴンスレイヤー&fの称号を手に入れました" to damager
+
+command /setdragonkillcount <offline player> [<number>]:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      send "&c/setdragonkillcount <offline player> [<number>]" to player
+    else:
+      if arg-2 is not set:
+        send "%{%arg-1's uuid%.killdragon.count}%" to player
+      else:
+        set {%arg-1's uuid%.killdragon.count} to arg-2
+        send "%arg-1%のキルカウントを%arg-2%に設定しました" to player
+
+on join:
+  set {_name} to player's uuid
+  if {%{_name}%.killdragon.count} is not set:
+    set {%{_name}%.killdragon.count} to 0

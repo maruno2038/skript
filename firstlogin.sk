@@ -1,0 +1,11 @@
+on first join:
+  broadcast "&a&lお初さんが生活鯖へやってきました"
+  broadcast "&6&l%player%さん サーバーへようこそ!"
+  wait 1 second
+  teleport player to {firstspawnpoint.location}
+
+command /fristspawnpointset:
+  permission:op
+  trigger:
+    set {firstspawnpoint.location} to location of player
+    send "&a初期スポーンを設定しました" to player

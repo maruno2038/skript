@@ -1,0 +1,3 @@
+on load:
+  set {_i} to iron pickaxe of efficiency 3
+  register new shapeless recipe for {_i} using iron ingot, iron ingot, iron ingot, air, stick, ari, air, stick, air

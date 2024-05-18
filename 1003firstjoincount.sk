@@ -1,0 +1,16 @@
+on first join:
+  add 1 to {1003.firstjoincount}
+
+command /1003firstjoincount [<text>] [<number>]:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      if {1003.firstjoincount} is not set:
+        set {1003.firstjoincount} to 0
+      send "&b新規募集中の参加者は&a%{1003.firstjoincount}%&b人です" to player
+    else if arg-1 is "set":
+      if arg-2 is not set:
+        send "&4数を指定してください" to player
+      else:
+        set {1003.firstjoincount} to arg-2
+        send "&b新規募集中の参加者は&a%{1003.firstjoincount}%&b人です" to player

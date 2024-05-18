@@ -1,0 +1,5 @@
+command /gc:
+	permission:op
+	permission message:そんなことすんなよぉ
+	trigger:
+		set player's gamemode to creative

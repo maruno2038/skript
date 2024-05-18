@@ -1,0 +1,20 @@
+#command /oi <player>:
+#  permission:op
+#  trigger:
+#    set {_inv::*} to all items in arg-1's inventory
+#    open chest inventory with 6 rows named "%arg-1%'s Inventory" to player
+#    loop {_inv::*}:
+#      add loop-value to player's current inventory
+
+
+on death:
+  set {_player} to event-player
+  set {%{_player}%deathinv::*} to all items in event-player's inventory
+
+command /deathinv <offline player>:
+  permission:op
+  trigger:
+    open chest inventory with 6 rows named "%arg-1%'s Inventory" to player
+    set {_player} to arg-1
+    loop {%{_player}%deathinv::*}:
+      add loop-value to player's current inventory

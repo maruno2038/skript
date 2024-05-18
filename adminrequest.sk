@@ -1,0 +1,192 @@
+command /adminrequest [<text>] [<text>]:
+  trigger:
+    if arg-1 is not set:
+      send "&c入力方法が違います" to player
+      send "&c/adminrequest <種類> <内容>" to player
+    else:
+      set {_player'sName} to player's name
+      if arg-2 is set:
+        if arg-1 is "system":
+          add "%arg-2% <%{_player'sName}%>" to {adminrequest.system.list::*}
+          send "&6送信しました。ご意見ありがとうございます(*'▽')" to player
+        if arg-1 is "proposal":
+          add "%arg-2% <%{_player'sName}%>" to {adminrequest.proposal.list::*}
+          send "&6送信しました。ご意見ありがとうございます(*'▽')" to player
+        if arg-1 is "ask":
+          add "%arg-2% <%{_player'sName}%>" to {adminrequest.ask.list::*}
+          send "&6送信しました。ご意見ありがとうございます(*'▽')" to player
+      else:
+        send "&c内容を設定してください" to player
+        send "&c/adminrequest <種類> <内容>" to player
+
+#------------------------------player click sign-------------------------------
+on rightclick on sign:
+  line 1 of the clicked block is "&6&l[AdminRequest]"
+  line 2 of the clicked block is "&bshow GUI"
+  open chest inventory with 3 rows named "&bお問い合わせ" to player
+  set slot 10 of player's current inventory to beacon named "&bシステム類"
+  set slot 13 of player's current inventory to book named "&c提案"
+  set slot 16 of player's current inventory to oak sign named "&e相談"
+  set slot 26 of player's current inventory to barrier named "&e閉じる"
+
+on inventory click:
+  name of clicked inventory is "&bお問い合わせ"
+  if event-item is barrier named "&e閉じる":
+    close player's inventory
+    stop
+  else if event-item is beacon named "&bシステム類":
+    set {%player%.request.send} to "system"
+  else if event-item is book named "&c提案":
+    set {%player%.request.send} to "proposal"
+  else if event-item is oak sign named "&e相談":
+    set {%player%.request.send} to "ask"
+  close player's inventory
+  send "&6チャット欄にお問い合わせ内容を入力してください" to player
+  send "&6中止する際は&a&lstop&6と打ってください" to player
+  set {%player%.request.stats} to true
+
+on chat:
+  if {%player%.request.stats} is true:
+    cancel event
+    if message is "stop":
+      set {%player%.request.stats} to false
+      send "&6中止しました" to player
+    else:
+      set {_player'sName} to player's name
+      add "%message% <%{_player'sName}%>" to {adminrequest.%{%player%.request.send}%.list::*}
+      send "&6送信しました。ご意見ありがとうございます(*'▽')" to player
+      set {%player%.request.stats} to false
+
+#add "%arg-2% <%{_player'sName}%>" to {adminrequest.system.list::*}
+
+on quit:
+  if {%player%.request.stats} is true:
+    set {%player%.request.stats} to false
+
+#------------------------------------------------------------------------↓運営用
+on rightclick on sign:
+  player is op
+  if line 1 of the clicked block is "adminqGUI":
+    set line 1 to "&6&l[AdminRequest]"
+    set line 2 to "&bshow GUI"
+    set line 4 to "&b右クリックでGUI表示"
+#-----------------------------------check-----------------------------------
+  if line 1 of the clicked block is "work list":
+    set line 1 to "&6&l[お仕事リスト]"
+    if line 2 of clicked block is "system":
+      set line 2 to "&bシステム"
+    else if line 2 of clicked block is "proposal":
+      set line 2 to "&c提案"
+    else if line 2 of clicked block is "ask":
+      set line 2 to "&e相談"
+    else if line 2 of clicked block is "gui":
+      set line 2 to "&9GUI"
+  if line 1 of the clicked block is "&6&l[お仕事リスト]":
+    if line 2 of clicked block is "&bシステム":
+      send "&6&l[Request]&b&lシステム類リスト" to player
+      if {adminrequest.system.list::*} is not set:
+        send "&lなにもないおっ！" to player
+      else:
+        send "&l%{adminrequest.system.list::*}%" to player
+    else if line 2 of clicked block is "&c提案":
+      send "&6&l[Request]&c&l提案類リスト" to player
+      if {adminrequest.proposal.list::*} is not set:
+        send "&lなにもないおっ！" to player
+      else:
+        send "&l%{adminrequest.proposal.list::*}%" to player
+    else if line 2 of clicked block is "&e相談":
+      send "&6&l[Request]&e&l相談類リスト" to player
+      if {adminrequest.ask.list::*} is not set:
+        send "&lなにもないおっ！" to player
+      else:
+        send "&l%{adminrequest.ask.list::*}%" to player
+    else if line 2 of clicked block is "&9GUI":
+      open chest inventory with 3 rows named "&6お仕事リスト" to player
+      set slot 10 of player's current inventory to beacon named "&bシステム"
+      set slot 13 of player's current inventory to book named "&c提案"
+      set slot 16 of player's current inventory to oak sign named "&e相談"
+      set slot 26 of player's current inventory to barrier named "&e閉じる"
+
+on inventory click:
+  player is op
+  name of clicked inventory is "&6お仕事リスト"
+  cancel event
+  set {_glass} to light gray stained glass pane
+#---------------------------------system---------------------------------------
+  if event-item is beacon named "&bシステム":
+    open chest inventory with 3 rows named "&6お仕事リスト" to player
+    set {%player%.request.mode} to "system"
+    set {_i} to 0
+    loop {adminrequest.system.list::*}:
+      if {%loop-value%.condition} is true:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&a進行中"
+      else if {%loop-value%.condition} is false:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&c進行停止中"
+      else:
+        set slot {_i} of player's current inventory to paper named "%loop-value%"
+      add 1 to {_i}
+    set slot 26 of player's current inventory to barrier named "&e閉じる"
+#-------------------------------proposal---------------------------------------
+  else if event-item is book named "&c提案":
+    open chest inventory with 3 rows named "&6お仕事リスト" to player
+    set {%player%.request.mode} to "proposal"
+    set {_i} to 0
+    loop {adminrequest.proposal.list::*}:
+      if {%loop-value%.condition} is true:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&a進行中"
+      else if {%loop-value%.condition} is false:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&c進行停止中"
+      else:
+        set slot {_i} of player's current inventory to paper named "%loop-value%"
+      add 1 to {_i}
+    set slot 26 of player's current inventory to barrier named "&e閉じる"
+#--------------------------------ask-------------------------------------------
+  else if event-item is oak sign named "&e相談":
+    open chest inventory with 3 rows named "&6お仕事リスト" to player
+    set {%player%.request.mode} to "ask"
+    set {_i} to 0
+    loop {adminrequest.ask.list::*}:
+      if {%loop-value%.condition} is true:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&a進行中"
+      else if {%loop-value%.condition} is false:
+        set slot {_i} of player's current inventory to paper named "%loop-value%" with lore "&c進行停止中"
+      else:
+        set slot {_i} of player's current inventory to paper named "%loop-value%"
+      add 1 to {_i}
+    set slot 26 of player's current inventory to barrier named "&e閉じる"
+
+
+
+on inventory click: #紙クリックしたのちの処理
+  player is op
+  name of clicked inventory is "&6お仕事リスト"
+  cancel event
+  if event-item is paper:
+    open chest inventory with 3 rows named "&6お仕事リスト" to player
+    set {%player%.itemName} to "%the name of event-item%"
+    set slot 10 of player's current inventory to lime wool named "&a完了"
+    set slot 14 of player's current inventory to diamond pickaxe named "&b着手中"
+    set slot 16 of player's current inventory to end crystal named "&c着手停止"
+    set slot 26 of player's current inventory to barrier named "&e閉じる"
+  if event-item is lime wool named "&a完了":
+    remove {%player%.itemName} from {adminrequest.%{%player%.request.mode}%.list::*}
+    close player's inventory
+  else if event-item is barrier named "&e閉じる":
+    close player's inventory
+  else if event-item is diamond pickaxe named "&b着手中":
+    set {%{%player%.itemName}%.condition} to true
+    close player's inventory
+  else if event-item is end crystal named "&c着手停止":
+    set {%{%player%.itemName}%.condition} to false
+    close player's inventory
+
+on tab complete of "/adminrequest":
+  set tab completions for position 1 to "system" , "proposal" and "ask"
+
+#command /oi <player>:
+#  permission:op
+#  trigger:
+#    set {_inv::*} to all items in arg-1's inventory
+#    open chest inventory with 6 rows named "%arg-1%'s Inventory" to player
+#    loop {_inv::*}:
+#      add loop-value to player's current inventory

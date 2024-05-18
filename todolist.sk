@@ -1,0 +1,107 @@
+command /todo [<text>] [<text>]:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      send "&6--やることリスト--" to player
+
+      if {todo.list::*} is not set:
+        send "やることはありません"  to player
+      else:
+        loop {todo.list::*}:
+          send "・%loop-value%" to player
+    else if arg-1 is "add":
+      if arg-2 is not set:
+        send "&6&l[ToDo]やることを入力してください" to player
+      else:
+        add arg-2 to {todo.list::*}
+        send "&6&l[ToDo]やることリストに追加しました" to player
+    else if arg-1 is "finish":
+      if arg-2 is not set:
+        send "&6&l[ToDo]終わらせたことを入力してください" to player
+      else:
+        remove arg-2 from {todo.list::*}
+        send "&6&l[ToDo]1つ終わらせましたっ！" to player
+    else if arg-1 is "notice":
+      if arg-2 is "on":
+        set {%player's uuid%.notice} to true
+        send "&6&l[ToDo]通知をオンにしました" to player
+      if arg-2 is "off":
+        set {%player's uuid%.notice} to false
+        send "&6&l[ToDo]通知をオフにしました" to player
+      else if arg-2 is not set:
+        if {%player's uuid%.notice} is true:
+          send "&6&l[ToDo]現在通知はオンです" to player
+        else if {%player's uuid%.notice} is false:
+          send "&6&l[ToDo]現在通知はオフです" to player
+        else:
+          send "&6&l[ToDo]現在通知は設定されていません" to player
+    else if arg-1 is "help":
+      send "&6&l[ToDo]ヘルプ" to player
+      send "&6&l/todo : リストを表示" to player
+      send "&6&l/todo add <thing> : やることを追加" to player
+      send "&6&l/todo finish <thing> : やることリストから削除" to player
+      send "&6&l/todo notice : 現在の通知の状態" to player
+      send "&6&l/todo notice <on|off> : 通知の設定" to player
+
+on join:
+  player is op
+  if {%player's uuid%.notice} is true:
+    send "&6&l[ToDo]&a&l%size of {todo.list::*}%&a&l件&6&lのやることがあります！" to player
+  if {%player's uuid%.mynotice} is true:
+    send "&9&l[MyToDo]&a&l%size of {%player's uuid%.mylist::*}%&a&l件&9&lのやることがあります！" to player
+
+on tab complete of "/todo":
+  set tab completions for position 1 to "add" , "finish" , "notice" and "help"
+  set tab completions for position 2 to {todo.list::*} if tab arg 1 is "finish"
+  set tab completions for position 2 to "on" and "off" if tab arg 1 is "notice"
+
+
+
+command /mytodo [<text>] [<text>]:
+  permission:op
+  trigger:
+    if arg-1 is not set:
+      send "&9--やることリスト(個人用)--" to player
+      if {%player's uuid%.mylist::*} is not set:
+        send "やることはありません"  to player
+      else:
+        loop {%player's uuid%.mylist::*}:
+          send "・%loop-value%" to player
+    else if arg-1 is "add":
+      if arg-2 is not set:
+        send "&9&l[MyToDo]やることを入力してください" to player
+      else:
+        add arg-2 to {%player's uuid%.mylist::*}
+        send "&9&l[MyToDo]やることリストに追加しました" to player
+    else if arg-1 is "finish":
+      if arg-2 is not set:
+        send "&9&l[MyToDo]終わらせたことを入力してください" to player
+      else:
+        remove arg-2 from {%player's uuid%.mylist::*}
+        send "&9&l[MyToDo]1つ終わらせましたっ！" to player
+    else if arg-1 is "notice":
+      if arg-2 is "on":
+        set {%player's uuid%.mynotice} to true
+        send "&9&l[MyToDo]通知をオンにしました" to player
+      if arg-2 is "off":
+        set {%player's uuid%.mynotice} to false
+        send "&9&l[MyToDo]通知をオフにしました" to player
+      else if arg-2 is not set:
+        if {%player's uuid%.mynotice} is true:
+          send "&9&l[MyToDo]現在通知はオンです" to player
+        else if {%player's uuid%.mynotice} is false:
+          send "&9&l[MyToDo]現在通知はオフです" to player
+        else:
+          send "&9&l[MyToDo]現在通知は設定されていません" to player
+    else if arg-1 is "help":
+      send "&9&l[MyToDo]ヘルプ" to player
+      send "&9&l/mytodo : リストを表示(個人用)" to player
+      send "&9&l/mytodo add <thing> : やることを追加" to player
+      send "&9&l/mytodo finish <thing> : やることリストから削除" to player
+      send "&9&l/mytodo notice : 現在の通知の状態" to player
+      send "&9&l/mytodo notice <on|off> : 通知の設定" to player
+
+#on tab complete of "/mytodo":
+#  set tab completions for position 1 to "add" , "finish" , "notice" and "help"
+#  set tab completions for position 2 to {%player's uuid%.mylist::*} if tab arg 1 is "finish"
+#  set tab completions for position 2 to "on" and "off" if tab arg 1 is "notice"

@@ -1,0 +1,21 @@
+command /seemyxp:
+  trigger:
+    set {_xp} to total experience of player
+    send "%{_xp}%" to player
+
+command /seemylv:
+  trigger:
+    set {_lv} to level of player
+    send "%{_lv}%" to player
+command /xpset:
+  trigger:
+    set {%player's uuid%.xpbank.input.mode} to true
+
+
+
+on chat:
+  if {%player's uuid%.xpbank.input.mode} is true:
+    cancel event
+    set {_%player's uuid%.xpbank.value} to message
+    add {_%player's uuid%.xpbank.value} to total xp of player
+    set {%player's uuid%.xpbank.input.mode} to false
